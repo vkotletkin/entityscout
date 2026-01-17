@@ -18,6 +18,7 @@ import ru.kotletkin.entityscout.document.dto.DocumentInfo;
 import ru.kotletkin.entityscout.document.dto.DocumentType;
 import ru.kotletkin.entityscout.document.extractor.NoEmbeddedDocumentExtractor;
 import ru.kotletkin.entityscout.document.model.TikaContent;
+import ru.kotletkin.entityscout.language.LanguageDetectionService;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class DocumentService {
 
     @Qualifier("recursiveAutoDetect")
     private final RecursiveParserWrapper autoDetectResursiveParser;
+    private final LanguageDetectionService languageDetectionService;
 
     public List<DocumentInfo> extractDocumentsAuto(MultipartFile file, DocumentType documentType, boolean isIncludeAttachments) {
         try {
@@ -76,8 +78,9 @@ public class DocumentService {
         for (TikaContent tikaContent : tikaContents) {
             String rawText = tikaContent.text();
             String cleanText = TextUtils.clean(rawText);
+            String language = languageDetectionService.detectLanguage(cleanText);
             DocumentInfo documentInfo = new DocumentInfo(tikaContent.resourceName(),
-                    "stub-lang",
+                    language,
                     tikaContent.title(),
                     tikaContent.contentType(),
                     cleanText,

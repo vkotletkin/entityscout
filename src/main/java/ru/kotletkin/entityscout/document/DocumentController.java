@@ -19,8 +19,7 @@ public class DocumentController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public List<DocumentInfo> extractAutoInfoAboutDocument(@RequestPart("file") MultipartFile file,
                                                            @RequestParam(value = "documentType", defaultValue = "AUTO") DocumentType documentType,
-                                                           @RequestParam("includeAttachments") boolean isIncludeAttachments,
-                                                           @RequestParam("clearText") boolean isCleanText) {
+                                                           @RequestParam("includeAttachments") boolean isIncludeAttachments) {
         return documentService.extractDocumentsAuto(file, documentType, isIncludeAttachments);
     }
 }
