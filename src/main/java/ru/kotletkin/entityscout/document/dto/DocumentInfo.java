@@ -4,7 +4,6 @@ import java.util.Map;
 
 public record DocumentInfo(String resourceName,
                            String language,
-                           String author,
                            String title,
                            String contentType,
                            String text,

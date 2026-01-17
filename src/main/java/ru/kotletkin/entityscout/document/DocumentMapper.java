@@ -19,7 +19,6 @@ public class DocumentMapper {
         Map<String, String> metadataMap = new HashMap<>();
 
         String text = Optional.ofNullable(metadata.get(TikaCoreProperties.TIKA_CONTENT)).orElse("");
-        String author = Optional.ofNullable(metadata.get(TikaCoreProperties.CREATED)).orElse("");
         String resourceName = Optional.ofNullable(metadata.get(TikaCoreProperties.RESOURCE_NAME_KEY)).orElse("");
         String title = Optional.ofNullable(metadata.get(TikaCoreProperties.TITLE)).orElse("");
         String contentType = Optional.ofNullable(metadata.get(Metadata.CONTENT_TYPE)).orElse("");
@@ -32,7 +31,7 @@ public class DocumentMapper {
             }
         }
 
-        return new TikaContent(resourceName, author, title, contentType, text, isEncrypted, metadataMap);
+        return new TikaContent(resourceName, title, contentType, text, isEncrypted, metadataMap);
     }
 
     public static List<TikaContent> toTikaContent(List<Metadata> metadataList) {

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
+import ru.kotletkin.entityscout.common.util.TextUtils;
 import ru.kotletkin.entityscout.document.dto.DocumentInfo;
 import ru.kotletkin.entityscout.document.dto.DocumentType;
 import ru.kotletkin.entityscout.document.extractor.NoEmbeddedDocumentExtractor;
@@ -26,13 +27,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DocumentExtractorService {
+public class DocumentService {
 
     @Qualifier("recursiveAutoDetect")
     private final RecursiveParserWrapper autoDetectResursiveParser;
 
-    public List<TikaContent> extractDocumentsAuto(MultipartFile file, DocumentType documentType, boolean isIncludeAttachments,
-                                                  boolean isCleanText) {
+    public List<DocumentInfo> extractDocumentsAuto(MultipartFile file, DocumentType documentType, boolean isIncludeAttachments) {
         try {
 
             ParseContext parseContext = new ParseContext();
@@ -52,7 +52,7 @@ public class DocumentExtractorService {
             }
 
             List<TikaContent> tikaContents = processDocument(file.getInputStream(), metadata, parseContext);
-            return tikaContents;
+            return postProcessingDocument(tikaContents);
         } catch (IOException _) {
             throw new RuntimeException();
         }
@@ -71,11 +71,21 @@ public class DocumentExtractorService {
         }
     }
 
-    private void postProcessingDocument(List<TikaContent> tikaContents) {
+    private List<DocumentInfo> postProcessingDocument(List<TikaContent> tikaContents) {
         List<DocumentInfo> documentInfos = new ArrayList<>();
         for (TikaContent tikaContent : tikaContents) {
-
+            String rawText = tikaContent.text();
+            String cleanText = TextUtils.clean(rawText);
+            DocumentInfo documentInfo = new DocumentInfo(tikaContent.resourceName(),
+                    "stub-lang",
+                    tikaContent.title(),
+                    tikaContent.contentType(),
+                    cleanText,
+                    tikaContent.isEncrypted(),
+                    tikaContent.metadata());
+            documentInfos.add(documentInfo);
         }
+        return documentInfos;
     }
 
     private RecursiveParserWrapperHandler createRecursiveParserWrapperHandler() {

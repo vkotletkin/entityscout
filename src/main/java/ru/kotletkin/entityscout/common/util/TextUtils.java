@@ -8,15 +8,11 @@ import java.util.regex.Pattern;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TextUtils {
 
-    private static final Pattern MULTI_SPACE = Pattern.compile(" {2,}");
-    private static final Pattern MULTI_NEWLINE = Pattern.compile("\\n{2,}");
-    private static final Pattern TRIM_LINES = Pattern.compile("(?m)^\\s+|\\s+$");
+    private static final Pattern CLEAR_TEXT_PATTERN = Pattern.compile("[\n\r\t ]+");
 
     public static String clean(String text) {
-        if (text == null || text.isEmpty()) return null;
-        text = TRIM_LINES.matcher(text).replaceAll("");
-        text = MULTI_NEWLINE.matcher(text).replaceAll("\n");
-        text = MULTI_SPACE.matcher(text).replaceAll(" ");
+        if (text == null || text.isEmpty()) return "";
+        text = CLEAR_TEXT_PATTERN.matcher(text).replaceAll(" ");
         return text.trim();
     }
 }
