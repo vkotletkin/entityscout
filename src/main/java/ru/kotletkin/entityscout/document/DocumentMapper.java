@@ -18,18 +18,21 @@ public class DocumentMapper {
 
         Map<String, String> metadataMap = new HashMap<>();
 
-        String text = metadata.get(TikaCoreProperties.TIKA_CONTENT);
-        String resourceName = metadata.get(TikaCoreProperties.RESOURCE_NAME_KEY);
+        String text = Optional.ofNullable(metadata.get(TikaCoreProperties.TIKA_CONTENT)).orElse("");
+        String author = Optional.ofNullable(metadata.get(TikaCoreProperties.CREATED)).orElse("");
+        String resourceName = Optional.ofNullable(metadata.get(TikaCoreProperties.RESOURCE_NAME_KEY)).orElse("");
         String title = Optional.ofNullable(metadata.get(TikaCoreProperties.TITLE)).orElse("");
-        String contentType = metadata.get(Metadata.CONTENT_TYPE);
+        String contentType = Optional.ofNullable(metadata.get(Metadata.CONTENT_TYPE)).orElse("");
         String isEncrypted = Optional.ofNullable(metadata.get(TikaCoreProperties.IS_ENCRYPTED)).orElse("false");
 
         String[] metadataKeys = metadata.names();
         for (String metaKey : metadataKeys) {
-            metadataMap.put(metaKey, metadata.get(metaKey));
+            if (!metaKey.contains("X-TIKA")) {
+                metadataMap.put(metaKey, metadata.get(metaKey));
+            }
         }
 
-        return new TikaContent(resourceName, title, contentType, text, isEncrypted, metadataMap);
+        return new TikaContent(resourceName, author, title, contentType, text, isEncrypted, metadataMap);
     }
 
     public static List<TikaContent> toTikaContent(List<Metadata> metadataList) {
