@@ -1,5 +1,6 @@
 package ru.kotletkin.entityscout.document.extractor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.extractor.EmbeddedDocumentExtractor;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+@Slf4j
 public class RecursiveAttachmentExtractor implements EmbeddedDocumentExtractor {
 
     private int depth = 0;
@@ -71,7 +73,7 @@ public class RecursiveAttachmentExtractor implements EmbeddedDocumentExtractor {
             embeddedContext.set(EmbeddedDocumentExtractor.class, this);
             AUTO_DETECT_PARSER.parse(embeddedStream, new DefaultHandler(), new Metadata(), embeddedContext);
         } catch (Exception e) {
-            System.err.println("Error in parsing content: " + e.getMessage());
+            log.warn("Error parsing file on extraction attachments with name: {}", filename);
         } finally {
             depth--;
         }
