@@ -7,7 +7,6 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.RecursiveParserWrapper;
 import org.apache.tika.sax.BasicContentHandlerFactory;
 import org.apache.tika.sax.RecursiveParserWrapperHandler;
@@ -20,7 +19,7 @@ import ru.kotletkin.entityscout.common.util.TextUtils;
 import ru.kotletkin.entityscout.common.util.ZipArchiveBuilder;
 import ru.kotletkin.entityscout.document.dto.DocumentInfo;
 import ru.kotletkin.entityscout.document.dto.DocumentType;
-import ru.kotletkin.entityscout.document.extractor.AttachmentCollectorExtractor;
+import ru.kotletkin.entityscout.document.extractor.RecursiveAttachmentExtractor;
 import ru.kotletkin.entityscout.document.extractor.NoEmbeddedDocumentExtractor;
 import ru.kotletkin.entityscout.document.model.TikaContent;
 import ru.kotletkin.entityscout.language.LanguageDetectionService;
@@ -54,9 +53,9 @@ public class DocumentService {
         Map<String, byte[]> attachments = new HashMap<>();
         ParseContext parseContext = new ParseContext();
         Metadata metadata = new Metadata();
-        ContentHandler handler = basicContentHandlerFactoryIgnore.getNewContentHandler();
+        ContentHandler handler = basicContentHandlerFactoryText.getNewContentHandler();
 
-        parseContext.set(EmbeddedDocumentExtractor.class, new AttachmentCollectorExtractor(attachments));
+        parseContext.set(EmbeddedDocumentExtractor.class, new RecursiveAttachmentExtractor(attachments, 10));
         processingMetadataOnType(metadata, documentType);
 
         try (InputStream is = file.getInputStream()) {
