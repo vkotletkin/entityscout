@@ -19,6 +19,7 @@ public class RecursiveAttachmentExtractor implements EmbeddedDocumentExtractor {
     private int depth = 0;
     private final int maximumDepth;
     private final Map<String, byte[]> attachments;
+    private static final AutoDetectParser AUTO_DETECT_PARSER = new AutoDetectParser();
 
     public RecursiveAttachmentExtractor(Map<String, byte[]> attachments, int maximumDepth) {
         this.maximumDepth = maximumDepth;
@@ -66,10 +67,9 @@ public class RecursiveAttachmentExtractor implements EmbeddedDocumentExtractor {
         depth++;
 
         try (InputStream embeddedStream = new ByteArrayInputStream(content)) {
-            AutoDetectParser parser = new AutoDetectParser();
             ParseContext embeddedContext = new ParseContext();
             embeddedContext.set(EmbeddedDocumentExtractor.class, this);
-            parser.parse(embeddedStream, new DefaultHandler(), new Metadata(), embeddedContext);
+            AUTO_DETECT_PARSER.parse(embeddedStream, new DefaultHandler(), new Metadata(), embeddedContext);
         } catch (Exception e) {
             System.err.println("Error in parsing content: " + e.getMessage());
         } finally {
