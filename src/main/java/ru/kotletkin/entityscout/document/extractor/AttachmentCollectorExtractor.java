@@ -4,16 +4,19 @@ import org.apache.tika.extractor.EmbeddedDocumentExtractor;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AttachmentCollectorExtractor implements EmbeddedDocumentExtractor {
 
+    private static final String ATTACHMENT_NAME_PREFIX = "attachment_";
+
     private final Map<String, byte[]> attachments;
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     public AttachmentCollectorExtractor(Map<String, byte[]> attachments) {
         this.attachments = attachments;
@@ -25,14 +28,19 @@ public class AttachmentCollectorExtractor implements EmbeddedDocumentExtractor {
     }
 
     @Override
-    public void parseEmbedded(InputStream inputStream, ContentHandler contentHandler, Metadata metadata, boolean b) throws SAXException, IOException {
+    public void parseEmbedded(InputStream inputStream, ContentHandler contentHandler, Metadata metadata, boolean b) throws IOException {
+
+        int count = counter.incrementAndGet();
+        if (count == 1) {
+            return;
+        }
 
         String filename = metadata.get(TikaCoreProperties.RESOURCE_NAME_KEY);
 
         if (filename == null) {
-            filename = "attachment_" + System.nanoTime();
+            filename = ATTACHMENT_NAME_PREFIX + System.nanoTime();
         }
-// todo: check filename on decode Mime
+
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         byte[] data = new byte[8192];
         int length;

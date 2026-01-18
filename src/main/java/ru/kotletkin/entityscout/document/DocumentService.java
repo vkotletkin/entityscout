@@ -9,7 +9,6 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.RecursiveParserWrapper;
 import org.apache.tika.sax.BasicContentHandlerFactory;
-import org.apache.tika.sax.ContentHandlerFactory;
 import org.apache.tika.sax.RecursiveParserWrapperHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import ru.kotletkin.entityscout.common.util.TextUtils;
+import ru.kotletkin.entityscout.common.util.ZipArchiveBuilder;
 import ru.kotletkin.entityscout.document.dto.DocumentInfo;
 import ru.kotletkin.entityscout.document.dto.DocumentType;
 import ru.kotletkin.entityscout.document.extractor.AttachmentCollectorExtractor;
@@ -39,39 +39,40 @@ public class DocumentService {
     @Qualifier("recursiveAutoDetect")
     private final RecursiveParserWrapper autoDetectResursiveParser;
 
+    @Qualifier("contentHandlerFactoryText")
+    private final BasicContentHandlerFactory basicContentHandlerFactoryText;
+
+    @Qualifier("contentHandlerFactoryIgnore")
+    private final BasicContentHandlerFactory basicContentHandlerFactoryIgnore;
+
+    private final AutoDetectParser autoDetectParser;
     private final LanguageDetectionService languageDetectionService;
 
-    public byte[] extractAttachmentOnZip(MultipartFile file) {
+    public byte[] extractAttachmentOnZip(MultipartFile file, DocumentType documentType) {
 
         Map<String, byte[]> attachments = new HashMap<>();
-
-        AutoDetectParser parser = new AutoDetectParser();
         ParseContext parseContext = new ParseContext();
         Metadata metadata = new Metadata();
-        ContentHandlerFactory factory =
-                new BasicContentHandlerFactory(
-                        BasicContentHandlerFactory.HANDLER_TYPE.IGNORE, -1);
+        ContentHandler handler = basicContentHandlerFactoryIgnore.getNewContentHandler();
 
-        ContentHandler contentHandler = factory.getNewContentHandler();
         parseContext.set(EmbeddedDocumentExtractor.class, new AttachmentCollectorExtractor(attachments));
+        processingMetadataOnType(metadata, documentType);
 
-
-        return null;
+        try (InputStream is = file.getInputStream()) {
+            autoDetectParser.parse(is, handler, metadata, parseContext);
+            // todo: check empty attachments
+            return ZipArchiveBuilder.createZipFromAttachments(attachments);
+        } catch (IOException | TikaException | SAXException _) {
+            throw new RuntimeException();
+        }
     }
 
     public List<DocumentInfo> extractDocumentsAuto(MultipartFile file, DocumentType documentType, boolean isIncludeAttachments) {
         try {
-
             ParseContext parseContext = new ParseContext();
             Metadata metadata = new Metadata();
             metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, file.getOriginalFilename());
-
-            switch (documentType) {
-                case AUTO -> {
-                }
-                case RFC822 ->
-                        metadata.set(TikaCoreProperties.CONTENT_TYPE_USER_OVERRIDE, documentType.getContentTypeOverride());
-            }
+            processingMetadataOnType(metadata, documentType);
 
             if (!isIncludeAttachments) {
                 parseContext.set(EmbeddedDocumentExtractor.class, new NoEmbeddedDocumentExtractor());
@@ -115,12 +116,16 @@ public class DocumentService {
         return documentInfos;
     }
 
+    private void processingMetadataOnType(Metadata metadata, DocumentType documentType) {
+        switch (documentType) {
+            case AUTO -> {
+            }
+            case RFC822 ->
+                    metadata.set(TikaCoreProperties.CONTENT_TYPE_USER_OVERRIDE, documentType.getContentTypeOverride());
+        }
+    }
+
     private RecursiveParserWrapperHandler createRecursiveParserWrapperHandler() {
-        return new RecursiveParserWrapperHandler(
-                new BasicContentHandlerFactory(
-                        BasicContentHandlerFactory.HANDLER_TYPE.TEXT,
-                        -1
-                )
-        );
+        return new RecursiveParserWrapperHandler(basicContentHandlerFactoryText);
     }
 }
