@@ -1,0 +1,13 @@
+services:
+  entityscout:
+    container_name: entityscout-app
+    image: entityscout:1.0.0-beta
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+    restart: unless-stopped

@@ -1,3 +1,7 @@
 # Entity Scout Project
 
-dockerhub: 
+dockerhub:
+
+needs: add lucene controllers
+
+add stanford corenlp to texts
