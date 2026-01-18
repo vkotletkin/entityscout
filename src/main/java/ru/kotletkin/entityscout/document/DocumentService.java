@@ -1,6 +1,7 @@
 package ru.kotletkin.entityscout.document;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.tika.exception.EncryptedDocumentException;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.extractor.EmbeddedDocumentExtractor;
 import org.apache.tika.metadata.Metadata;
@@ -78,8 +79,8 @@ public class DocumentService {
 
             List<TikaContent> tikaContents = processDocument(file.getInputStream(), metadata, parseContext);
             return postProcessingDocument(tikaContents);
-        } catch (IOException _) {
-            throw new RuntimeException();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -90,8 +91,11 @@ public class DocumentService {
             autoDetectResursiveParser.parse(bufferedInputStream, handler, metadata, parseContext);
             List<Metadata> metadataList = handler.getMetadataList();
             return DocumentMapper.toTikaContent(metadataList);
-        } catch (IOException | SAXException | TikaException _) {
-            throw new RuntimeException();
+        } catch (EncryptedDocumentException e) {
+            List<Metadata> metadataList = handler.getMetadataList();
+            return DocumentMapper.toTikaContent(metadataList);
+        } catch (IOException | SAXException | TikaException e) {
+            throw new RuntimeException(e);
         }
     }
 
