@@ -19,8 +19,8 @@ import ru.kotletkin.entityscout.common.util.TextUtils;
 import ru.kotletkin.entityscout.common.util.ZipArchiveBuilder;
 import ru.kotletkin.entityscout.document.dto.DocumentInfo;
 import ru.kotletkin.entityscout.document.dto.DocumentType;
-import ru.kotletkin.entityscout.document.extractor.RecursiveAttachmentExtractor;
 import ru.kotletkin.entityscout.document.extractor.NoEmbeddedDocumentExtractor;
+import ru.kotletkin.entityscout.document.extractor.RecursiveAttachmentExtractor;
 import ru.kotletkin.entityscout.document.model.TikaContent;
 import ru.kotletkin.entityscout.language.LanguageDetectionService;
 
@@ -48,19 +48,17 @@ public class DocumentService {
     private final AutoDetectParser autoDetectParser;
     private final LanguageDetectionService languageDetectionService;
 
-    public byte[] extractAttachmentOnZip(MultipartFile file, DocumentType documentType) {
-
+    public byte[] extractAttachmentOnZip(MultipartFile file, DocumentType documentType, int maximumDepth) {
         Map<String, byte[]> attachments = new HashMap<>();
         ParseContext parseContext = new ParseContext();
         Metadata metadata = new Metadata();
-        ContentHandler handler = basicContentHandlerFactoryText.getNewContentHandler();
+        ContentHandler handler = basicContentHandlerFactoryIgnore.getNewContentHandler();
 
-        parseContext.set(EmbeddedDocumentExtractor.class, new RecursiveAttachmentExtractor(attachments, 10));
+        parseContext.set(EmbeddedDocumentExtractor.class, new RecursiveAttachmentExtractor(attachments, maximumDepth));
         processingMetadataOnType(metadata, documentType);
 
         try (InputStream is = file.getInputStream()) {
             autoDetectParser.parse(is, handler, metadata, parseContext);
-            // todo: check empty attachments
             return ZipArchiveBuilder.createZipFromAttachments(attachments);
         } catch (IOException | TikaException | SAXException _) {
             throw new RuntimeException();
@@ -86,7 +84,6 @@ public class DocumentService {
     }
 
     private List<TikaContent> processDocument(InputStream inputStream, Metadata metadata, ParseContext parseContext) {
-
         RecursiveParserWrapperHandler handler = createRecursiveParserWrapperHandler();
 
         try (BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream)) {
