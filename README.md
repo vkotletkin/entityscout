@@ -1,6 +1,6 @@
 # Entity Scout Project
 
-dockerhub:
+dockerhub: `docker pull nkhzrd/entityscout:1.0.0-beta`
 
 needs: add lucene controllers
 
