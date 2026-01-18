@@ -27,7 +27,6 @@ public class ZipArchiveBuilder {
                 zos.putNextEntry(zipEntry);
                 zos.write(content);
                 zos.closeEntry();
-
             }
         }
         return zipBuffer.toByteArray();
