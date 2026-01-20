@@ -106,7 +106,6 @@ public class DocumentService {
         for (TikaContent tikaContent : tikaContents) {
             String rawText = tikaContent.text();
             String cleanText = TextUtils.clean(rawText);
-            entityService.test(cleanText);
             String language = languageDetectionService.detectLanguage(cleanText);
             DocumentInfo documentInfo = new DocumentInfo(tikaContent.resourceName(),
                     language,

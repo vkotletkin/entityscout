@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class EntityService {
-
-    private final StanfordCoreNLP coreNLP;
-
-    public void test(String text) {
-        CoreDocument document = new CoreDocument(text);
-        coreNLP.annotate(document);
-
-        System.out.println();
-    }
+//
+//    private final StanfordCoreNLP coreNLP;
+//
+//    public void test(String text) {
+//        CoreDocument document = new CoreDocument(text);
+//        coreNLP.annotate(document);
+//
+//        System.out.println();
+//    }
 }
