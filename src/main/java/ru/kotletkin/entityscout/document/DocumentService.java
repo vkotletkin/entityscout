@@ -23,6 +23,7 @@ import ru.kotletkin.entityscout.document.dto.DocumentType;
 import ru.kotletkin.entityscout.document.extractor.NoEmbeddedDocumentExtractor;
 import ru.kotletkin.entityscout.document.extractor.RecursiveAttachmentExtractor;
 import ru.kotletkin.entityscout.document.model.TikaContent;
+import ru.kotletkin.entityscout.entity.EntityService;
 import ru.kotletkin.entityscout.language.LanguageDetectionService;
 
 import java.io.BufferedInputStream;
@@ -48,6 +49,7 @@ public class DocumentService {
 
     private final AutoDetectParser autoDetectParser;
     private final LanguageDetectionService languageDetectionService;
+    private final EntityService entityService;
 
     public byte[] extractAttachmentOnZip(MultipartFile file, DocumentType documentType, int maximumDepth) {
         Map<String, byte[]> attachments = new HashMap<>();
@@ -104,6 +106,7 @@ public class DocumentService {
         for (TikaContent tikaContent : tikaContents) {
             String rawText = tikaContent.text();
             String cleanText = TextUtils.clean(rawText);
+            entityService.test(cleanText);
             String language = languageDetectionService.detectLanguage(cleanText);
             DocumentInfo documentInfo = new DocumentInfo(tikaContent.resourceName(),
                     language,
