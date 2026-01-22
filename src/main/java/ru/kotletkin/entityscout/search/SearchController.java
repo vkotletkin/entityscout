@@ -2,13 +2,11 @@ package ru.kotletkin.entityscout.search;
 
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.kotletkin.entityscout.common.dto.BaseRequest;
 import ru.kotletkin.entityscout.search.dto.SearchSingleDTO;
-import ru.kotletkin.entityscout.search.dto.SearchSingleRequest;
 
 @RestController
 @RequestMapping("/api/search")
@@ -18,7 +16,8 @@ public class SearchController {
     private final SearchService searchService;
 
     @PostMapping("/single")
-    public SearchSingleDTO searchSingle(@Valid @RequestBody SearchSingleRequest searchSingleRequest) {
-        return searchService.searchBySingleRequest(searchSingleRequest);
+    public SearchSingleDTO searchSingle(@Valid @RequestBody BaseRequest request,
+                                        @RequestParam("query") @NotBlank String query) {
+        return searchService.searchBySingleRequest(request.text(), query);
     }
 }

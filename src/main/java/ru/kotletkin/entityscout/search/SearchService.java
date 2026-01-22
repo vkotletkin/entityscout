@@ -8,7 +8,6 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.springframework.stereotype.Service;
 import ru.kotletkin.entityscout.search.dto.SearchSingleDTO;
-import ru.kotletkin.entityscout.search.dto.SearchSingleRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +18,7 @@ public class SearchService {
 
     private final StandardAnalyzer standardAnalyzer;
 
-    public SearchSingleDTO searchBySingleRequest(SearchSingleRequest searchSingleRequest) {
-        String text = searchSingleRequest.text();
-        String query = searchSingleRequest.query();
+    public SearchSingleDTO searchBySingleRequest(String text, String query) {
         float score = findByTextInMemory(query, text);
         boolean result = score > NOT_FOUND_SCORE_VALUE;
         return new SearchSingleDTO(result, score);
