@@ -1,4 +1,4 @@
-package ru.kotletkin.entityscout.common.config;
+package ru.kotletkin.entityscout.config;
 
 
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
@@ -9,7 +9,7 @@ import java.util.Properties;
 
 @Configuration
 public class CoreNLPConfiguration {
-
+//
 //    @Bean
 //    public StanfordCoreNLP coreNLP() {
 //        Properties properties = new Properties();

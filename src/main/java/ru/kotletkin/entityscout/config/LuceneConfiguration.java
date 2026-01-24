@@ -1,4 +1,4 @@
-package ru.kotletkin.entityscout.common.config;
+package ru.kotletkin.entityscout.config;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.springframework.context.annotation.Bean;

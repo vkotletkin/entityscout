@@ -1,4 +1,4 @@
-package ru.kotletkin.entityscout.common.config;
+package ru.kotletkin.entityscout.config;
 
 import org.apache.tika.langdetect.optimaize.OptimaizeLangDetector;
 import org.apache.tika.language.detect.LanguageDetector;

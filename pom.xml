@@ -129,6 +129,12 @@
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
             <version>4.5.10</version>
+            <classifier>models-english-kbp</classifier>
+        </dependency>
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>4.5.10</version>
             <classifier>models-italian</classifier>
         </dependency>
         <dependency>

@@ -15,7 +15,6 @@ import ru.kotletkin.entityscout.language.dto.LanguageDetectionDTO;
 public class LanguageController {
 
     private final LanguageService languageService;
-
     @PostMapping
     public LanguageDetectionDTO detectLanguage(@Valid @RequestBody BaseRequest request) {
         return languageService.detectLanguage(request.text());
