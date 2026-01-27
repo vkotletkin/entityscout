@@ -2,6 +2,7 @@ package ru.kotletkin.entityscout.document;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.tika.exception.EncryptedDocumentException;
+import org.apache.tika.exception.TikaConfigException;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.extractor.EmbeddedDocumentExtractor;
 import org.apache.tika.metadata.Metadata;
@@ -9,6 +10,8 @@ import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.RecursiveParserWrapper;
+import org.apache.tika.parser.ocr.TesseractOCRConfig;
+import org.apache.tika.parser.ocr.TesseractOCRParser;
 import org.apache.tika.sax.BasicContentHandlerFactory;
 import org.apache.tika.sax.RecursiveParserWrapperHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,7 +26,6 @@ import ru.kotletkin.entityscout.document.dto.DocumentType;
 import ru.kotletkin.entityscout.document.extractor.NoEmbeddedDocumentExtractor;
 import ru.kotletkin.entityscout.document.extractor.RecursiveAttachmentExtractor;
 import ru.kotletkin.entityscout.document.model.TikaContent;
-import ru.kotletkin.entityscout.entity.EntityService;
 import ru.kotletkin.entityscout.language.LanguageService;
 
 import java.io.BufferedInputStream;
@@ -49,7 +51,6 @@ public class DocumentService {
 
     private final AutoDetectParser autoDetectParser;
     private final LanguageService languageDetectionService;
-    private final EntityService entityService;
 
     public byte[] extractAttachmentOnZip(MultipartFile file, DocumentType documentType, int maximumDepth) {
         Map<String, byte[]> attachments = new HashMap<>();
@@ -73,6 +74,7 @@ public class DocumentService {
             ParseContext parseContext = new ParseContext();
             Metadata metadata = new Metadata();
             metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, file.getOriginalFilename());
+
             processingMetadataOnType(metadata, documentType);
 
             if (!isIncludeAttachments) {
