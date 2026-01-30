@@ -2,7 +2,6 @@ package ru.kotletkin.entityscout.document;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.tika.exception.EncryptedDocumentException;
-import org.apache.tika.exception.TikaConfigException;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.extractor.EmbeddedDocumentExtractor;
 import org.apache.tika.metadata.Metadata;
@@ -10,8 +9,6 @@ import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.RecursiveParserWrapper;
-import org.apache.tika.parser.ocr.TesseractOCRConfig;
-import org.apache.tika.parser.ocr.TesseractOCRParser;
 import org.apache.tika.sax.BasicContentHandlerFactory;
 import org.apache.tika.sax.RecursiveParserWrapperHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -86,6 +83,22 @@ public class DocumentService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<DocumentInfo> extractDocumentsAuto(InputStream inputStream, String filename, DocumentType documentType, boolean isIncludeAttachments) {
+
+        ParseContext parseContext = new ParseContext();
+        Metadata metadata = new Metadata();
+        metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, filename);
+
+        processingMetadataOnType(metadata, documentType);
+
+        if (!isIncludeAttachments) {
+            parseContext.set(EmbeddedDocumentExtractor.class, new NoEmbeddedDocumentExtractor());
+        }
+
+        List<TikaContent> tikaContents = processDocument(inputStream, metadata, parseContext);
+        return postProcessingDocument(tikaContents);
     }
 
     private List<TikaContent> processDocument(InputStream inputStream, Metadata metadata, ParseContext parseContext) {
