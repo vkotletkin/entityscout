@@ -34,16 +34,16 @@ public class JavelitUiComponent {
     private void app() {
 
         var page = Jt.navigation(
-                        Jt.page("/home", this::homePage).title("Home Page"),
+                        Jt.page("/home", this::homePage).title("Home Page").icon("\uD83C\uDFE0"),
                         Jt.page("/language-detector", this::languageDetectorPage).title("Language Detection").icon("\uD83D\uDCAC"),
                         Jt.page("/extract-text", this::textExtractionPage).title("Text Extraction").icon("\uD83D\uDCDD"),
-                        Jt.page("/search-lucene", this::luceneSearchPage).title("Text Search"))
+                        Jt.page("/search-lucene", this::luceneSearchPage).title("Text Search").icon("\uD83D\uDD0D"))
                 .use();
         page.run();
     }
 
     private void homePage() {
-        Jt.title("This is home page").use();
+        Jt.html("<h1 style='text-align: center;'>\uD83C\uDFE0 Home Page</h1>").use();
     }
 
     private void languageDetectorPage() {
@@ -91,7 +91,7 @@ public class JavelitUiComponent {
     }
 
     private void luceneSearchPage() {
-        Jt.html("<h1 style='text-align: center;'>\uD83D\uDCDD Text Search (Apache Lucene Engine)</h1>").use();
+        Jt.html("<h1 style='text-align: center;'>\uD83D\uDD0D Text Search (Apache Lucene Engine)</h1>").use();
         Jt.divider().use();
 
         var form = Jt.form().use();
