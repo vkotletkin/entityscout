@@ -12,6 +12,7 @@ import ru.kotletkin.entityscout.document.dto.DocumentType;
 import ru.kotletkin.entityscout.language.LanguageService;
 import ru.kotletkin.entityscout.language.dto.LanguageDetectionDTO;
 import ru.kotletkin.entityscout.search.SearchService;
+import ru.kotletkin.entityscout.search.dto.SearchSingleDTO;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -35,7 +36,8 @@ public class JavelitUiComponent {
         var page = Jt.navigation(
                         Jt.page("/home", this::homePage).title("Home Page"),
                         Jt.page("/language-detector", this::languageDetectorPage).title("Language Detection").icon("\uD83D\uDCAC"),
-                        Jt.page("/extract-text", this::textExtractionPage).title("Text Extraction").icon("\uD83D\uDCDD"))
+                        Jt.page("/extract-text", this::textExtractionPage).title("Text Extraction").icon("\uD83D\uDCDD"),
+                        Jt.page("/search-lucene", this::luceneSearchPage).title("Text Search"))
                 .use();
         page.run();
     }
@@ -63,8 +65,8 @@ public class JavelitUiComponent {
     private void textExtractionPage() {
 
         Jt.html("<h1 style='text-align: center;'>\uD83D\uDCDD Text Extraction</h1>").use();
-
         Jt.divider().use();
+
         Jt.info("Do not use large files in the Web version, send ultra-large files via API. The Web version is used exclusively for tests").use();
         Jt.divider().use();
 
@@ -86,7 +88,27 @@ public class JavelitUiComponent {
                 }
             }
         }
+    }
 
+    private void luceneSearchPage() {
+        Jt.html("<h1 style='text-align: center;'>\uD83D\uDCDD Text Search (Apache Lucene Engine)</h1>").use();
+        Jt.divider().use();
+
+        var form = Jt.form().use();
+        String text = Jt.textArea("Entire your text").use(form);
+        String query = Jt.textArea("Entire your Lucene query").use(form);
+
+        if (Jt.formSubmitButton("Execute query").use(form) && !text.isBlank() && !query.isBlank()) {
+            try {
+                SearchSingleDTO searchSingleDTO = searchService.searchBySingleRequest(text, query);
+                Jt.success("Query execution - SUCCESS!").use();
+                Jt.text("Result: " + searchSingleDTO.result()).use();
+                Jt.text("Score: " + searchSingleDTO.score()).use();
+            } catch (Exception e) {
+                Jt.divider().use();
+                Jt.error("Check the correctness of the request").use();
+            }
+        }
     }
 
 }
