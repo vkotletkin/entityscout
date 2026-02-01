@@ -65,6 +65,8 @@ public class JavelitUiComponent {
         Jt.html("<h1 style='text-align: center;'>\uD83D\uDCDD Text Extraction</h1>").use();
 
         Jt.divider().use();
+        Jt.info("Do not use large files in the Web version, send ultra-large files via API. The Web version is used exclusively for tests").use();
+        Jt.divider().use();
 
         var uploadedFiles = Jt.fileUploader("Choose a file").use();
 
@@ -73,7 +75,16 @@ public class JavelitUiComponent {
             String filename = file.filename();
             List<DocumentInfo> documentInfos = documentService.extractDocumentsAuto(
                     new ByteArrayInputStream(file.content()), filename, DocumentType.AUTO, true);
-            Jt.text(documentInfos.toString()).use();
+
+            Jt.success("Text extraction - SUCCESS!").use();
+            Jt.divider().use();
+
+            if (!documentInfos.isEmpty()) {
+                for (DocumentInfo documentInfo : documentInfos) {
+                    var expander = Jt.expander(documentInfo.resourceName()).use();
+                    Jt.text(documentInfo.text()).use(expander);
+                }
+            }
         }
 
     }
