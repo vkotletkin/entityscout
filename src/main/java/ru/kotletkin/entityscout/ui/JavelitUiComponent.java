@@ -43,7 +43,15 @@ public class JavelitUiComponent {
     }
 
     private void homePage() {
+
         Jt.html("<h1 style='text-align: center;'>\uD83C\uDFE0 Home Page</h1>").use();
+        Jt.divider().use();
+
+        Jt.html("<h2 style='text-align: center;'>This is the start page of the Entity Scout service</h2>").use();
+
+        Jt.text("The web page is intended to introduce functionality and is not intended for production environments. " +
+                "Use the API. An example can be seen on /swagger-ui/index.html the endpoint. The service implements document extraction recursively using Apache Tika, and detects the language using the Optimaize Language Detector. " +
+                "Allows you to perform queries using Apache Lucene using MemoryIndex, which provides incredibly high efficiency when searching on a thread.").use();
     }
 
     private void languageDetectorPage() {
@@ -91,6 +99,7 @@ public class JavelitUiComponent {
     }
 
     private void luceneSearchPage() {
+
         Jt.html("<h1 style='text-align: center;'>\uD83D\uDD0D Text Search (Apache Lucene Engine)</h1>").use();
         Jt.divider().use();
 
