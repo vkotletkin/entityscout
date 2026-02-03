@@ -129,4 +129,4 @@ Contributions are welcome! Fork the repository, create a branch, commit your cha
 
 ## Contact
 
-For questions or support, open an issue on GitHub or contact via email (placeholder: your.email@example.com).
+For questions or support, open an issue on GitHub or contact via email: nkhzrd@yandex.ru
